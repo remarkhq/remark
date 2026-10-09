@@ -9,6 +9,6 @@
     "test": "vitest run tests"
   },
   "devDependencies": {
-    "esbuild": "^0.25.10"
+    "esbuild": "^0.28.1"
   }
 }
