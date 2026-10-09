@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "@remark/shared": ["packages/shared/src/index.ts"],
+      "@remark/config": ["packages/config/src/index.ts"],
+      "@remark/security": ["packages/security/src/index.ts"],
+      "@remark/client": ["packages/client/src/index.ts"],
+      "@remark/ui": ["packages/ui/src/index.ts"],
+      "@remark/test-utils": ["packages/test-utils/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+}

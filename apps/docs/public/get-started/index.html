@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Get started · Remark</title>
+    <link rel="stylesheet" href="/assets/styles.css" />
+  </head>
+  <body>
+    <header>
+      <img
+        src="https://raw.githubusercontent.com/remarkhq/.github/main/profile/remark.svg"
+        width="220"
+        alt="Remark logo"
+      />
+      <h1>Add Remark</h1>
+      <p>Generate a safe embed snippet for your site.</p>
+    </header>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/docs/">Docs</a>
+      <a href="/privacy/">Privacy</a>
+    </nav>
+    <main>
+      <p>
+        Remark maps each page to a GitHub issue. Fill in values below to
+        generate your snippet.
+      </p>
+      <form id="setup-form">
+        <label for="repository">Repository (owner/repository)</label>
+        <input
+          id="repository"
+          name="repository"
+          required
+          placeholder="owner/comments"
+        />
+
+        <label for="issue-term">Issue strategy</label>
+        <select id="issue-term" name="issueTerm">
+          <option value="pathname">pathname</option>
+          <option value="url">url</option>
+          <option value="title">title</option>
+          <option value="og:title">og:title</option>
+          <option value="custom">custom</option>
+        </select>
+
+        <label for="theme">Theme</label>
+        <select id="theme" name="theme">
+          <option value="auto">auto</option>
+          <option value="light">light</option>
+          <option value="dark">dark</option>
+        </select>
+
+        <label for="reactions">Reactions</label>
+        <select id="reactions" name="reactions">
+          <option value="true">enabled</option>
+          <option value="false">disabled</option>
+        </select>
+
+        <label for="api-base-url">Remark API URL</label>
+        <input
+          id="api-base-url"
+          name="apiBaseUrl"
+          required
+          placeholder="https://api.remark.example"
+        />
+
+        <button type="submit">Generate snippet</button>
+      </form>
+
+      <label for="snippet-output">Embed snippet</label>
+      <textarea id="snippet-output" rows="12" aria-live="polite"></textarea>
+      <button id="copy-snippet" type="button">Copy</button>
+
+      <h3>Before going live</h3>
+      <ul>
+        <li>Do not place tokens or secrets in the embed snippet.</li>
+        <li>Enable Issues on your repository.</li>
+        <li>Grant your Remark bot account repository access.</li>
+        <li>Visitors authenticate with GitHub before posting comments.</li>
+      </ul>
+
+      <p><a href="/docs/installation/">Read full installation guide</a></p>
+    </main>
+    <script type="module" src="/assets/setup-wizard.js"></script>
+  </body>
+</html>
