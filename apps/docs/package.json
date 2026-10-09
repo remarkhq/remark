@@ -1,0 +1,14 @@
+{
+  "name": "@remark/docs",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "node ../../scripts/build-docs.mjs",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run tests"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1"
+  }
+}

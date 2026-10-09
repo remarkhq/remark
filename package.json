@@ -1,0 +1,31 @@
+{
+  "name": "remark",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Remark is an open-source comments widget powered by GitHub Issues.",
+  "license": "MIT",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -ws",
+    "lint": "npm run lint -ws",
+    "typecheck": "npm run typecheck -ws",
+    "test": "npm run test -ws",
+    "test:unit": "vitest run",
+    "test:browser": "playwright test",
+    "format": "prettier --check .",
+    "format:write": "prettier --write ."
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/cors": "^2.8.19",
+    "@types/node": "^22.18.8",
+    "@types/sanitize-html": "^2.16.0",
+    "prettier": "^3.6.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.6"
+  }
+}
