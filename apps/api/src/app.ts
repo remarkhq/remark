@@ -1,4 +1,3 @@
-import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { type Request, type Response } from "express";
 import rateLimit from "express-rate-limit";
@@ -48,6 +47,19 @@ const parseRepository = (
   return { owner, repo };
 };
 
+const readCookie = (
+  cookieHeader: string | undefined,
+  name: string,
+): string | undefined => {
+  if (!cookieHeader) return undefined;
+  const pair = cookieHeader
+    .split(";")
+    .map((chunk) => chunk.trim())
+    .find((chunk) => chunk.startsWith(`${name}=`));
+  if (!pair) return undefined;
+  return decodeURIComponent(pair.slice(name.length + 1));
+};
+
 export const createApp = (deps?: Partial<AppDeps>) => {
   const env = deps?.env ?? readEnv(process.env);
   const allowedRepositories = parseAllowedRepositories(
@@ -59,22 +71,27 @@ export const createApp = (deps?: Partial<AppDeps>) => {
     env.REMARK_BOT_TOKEN,
     deps?.fetchImpl ?? fetch,
   );
+  const allowedOrigins = new Set([
+    new URL(env.PUBLIC_APP_URL).origin,
+    new URL(env.PUBLIC_DOCS_URL).origin,
+  ]);
 
   const app = express();
   app.disable("x-powered-by");
   app.use(
     cors({
-      origin: true,
+      origin: (origin, callback) => {
+        if (!origin || allowedOrigins.has(origin)) {
+          callback(null, true);
+          return;
+        }
+        callback(new Error("Origin not allowed"));
+      },
       credentials: true,
     }),
   );
-  app.use(
-    helmet({
-      contentSecurityPolicy: false,
-    }),
-  );
+  app.use(helmet());
   app.use(express.json({ limit: "20kb" }));
-  app.use(cookieParser());
   app.use(
     rateLimit({
       windowMs: env.RATE_LIMIT_WINDOW_SECONDS * 1000,
@@ -85,7 +102,7 @@ export const createApp = (deps?: Partial<AppDeps>) => {
   );
 
   const readSession = (req: Request) => {
-    const id = req.cookies[SESSION_COOKIE] as string | undefined;
+    const id = readCookie(req.headers.cookie, SESSION_COOKIE);
     if (!id) return undefined;
     return sessionStore.get(id);
   };
@@ -98,6 +115,32 @@ export const createApp = (deps?: Partial<AppDeps>) => {
       maxAge: SESSION_TTL,
     });
   };
+
+  app.use((req, _res, next) => {
+    const safeMethod =
+      req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS";
+    if (safeMethod || req.path === "/auth/github/callback") {
+      next();
+      return;
+    }
+
+    const origin = req.headers.origin;
+    if (origin && !allowedOrigins.has(origin)) {
+      next(new AppError("UNAUTHORIZED", "Origin is not allowed", 403));
+      return;
+    }
+
+    const session = readSession(req);
+    if (session) {
+      const headerToken = String(req.headers["x-csrf-token"] ?? "");
+      if (!assertCsrf(session.csrfToken, headerToken)) {
+        next(new AppError("UNAUTHORIZED", "CSRF validation failed", 403));
+        return;
+      }
+    }
+
+    next();
+  });
 
   app.get("/health", (_req, res) => {
     res.json({ status: "ok", service: "remark-api" });
@@ -207,7 +250,7 @@ export const createApp = (deps?: Partial<AppDeps>) => {
   });
 
   app.post("/auth/logout", (req, res) => {
-    const id = req.cookies[SESSION_COOKIE] as string | undefined;
+    const id = readCookie(req.headers.cookie, SESSION_COOKIE);
     if (id) sessionStore.destroy(id);
     res.clearCookie(SESSION_COOKIE);
     res.json({ ok: true });

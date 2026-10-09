@@ -48,7 +48,16 @@ export const normalizePathname = (input: string): string => {
     const url = new URL(input, "https://remark.local");
     return url.pathname.replace(/\/+$/, "") || "/";
   } catch {
-    const clean = input.trim().replace(/[?#].*$/, "");
+    const trimmed = input.trim();
+    const hashIndex = trimmed.indexOf("#");
+    const queryIndex = trimmed.indexOf("?");
+    const boundaryCandidates = [hashIndex, queryIndex].filter(
+      (value) => value >= 0,
+    );
+    const boundary = boundaryCandidates.length
+      ? Math.min(...boundaryCandidates)
+      : trimmed.length;
+    const clean = trimmed.slice(0, boundary);
     return clean.startsWith("/") ? clean : `/${clean}`;
   }
 };

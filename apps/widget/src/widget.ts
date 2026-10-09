@@ -185,6 +185,11 @@ const start = async (): Promise<void> => {
         await fetch(`${config.apiBaseUrl}/auth/logout`, {
           method: "POST",
           credentials: "include",
+          headers: session.csrfToken
+            ? {
+                "X-CSRF-Token": session.csrfToken,
+              }
+            : undefined,
         });
         window.location.reload();
       });
